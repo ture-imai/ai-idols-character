@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>推しステ キャラクター名鑑</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: linear-gradient(180deg, #1a0030 0%, #0a0a0f 100%);
+      border-bottom: 1px solid #2a2a4a;
+    }
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+    header p { color: #888; font-size: 1rem; letter-spacing: 0.05em; }
+    nav {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 10px; padding: 20px; background: #0d0d1a;
+      border-bottom: 1px solid #1e1e3a; position: sticky; top: 0; z-index: 100;
+    }
+    nav a {
+      color: #a78bfa; text-decoration: none; font-size: 0.85rem;
+      padding: 6px 14px; border: 1px solid #3a3a6a; border-radius: 20px; transition: all 0.3s;
+    }
+    nav a:hover { background: #a78bfa; color: #0a0a0f; border-color: #a78bfa; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 30px; max-width: 1400px; margin: 0 auto; padding: 40px 20px;
+    }
+    .card {
+      background: linear-gradient(145deg, #111120, #0e0e1e);
+      border: 1px solid #2a2a4a; border-radius: 16px; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s; scroll-margin-top: 80px;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(167,139,250,0.2); }
+    .card-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+    .card-header {
+      padding: 28px 24px 20px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2)); position: relative;
+    }
+    .card-number {
+      position: absolute; top: 16px; right: 20px;
+      font-size: 3rem; font-weight: 900; opacity: 0.15; color: #fff; line-height: 1;
+    }
+    .card-name { font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .card-name-sub { font-size: 0.85rem; color: rgba(255,255,255,0.75); margin-top: 4px; }
+    .card-concept { margin-top: 10px; font-size: 0.9rem; color: rgba(255,255,255,0.9); font-style: italic; }
+    .card-body { padding: 20px 24px; }
+    .section { margin-bottom: 18px; }
+    .section-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+      color: #888; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; margin-bottom: 10px;
+    }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+    .profile-item { font-size: 0.82rem; }
+    .profile-label { color: #666; font-size: 0.72rem; }
+    .profile-value { color: #ddd; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-size: 0.75rem; padding: 3px 10px; border-radius: 12px;
+      background: #1e1e3a; color: #a78bfa; border: 1px solid #3a3a6a;
+    }
+    .song-list { list-style: none; }
+    .song-list li {
+      font-size: 0.82rem; color: #bbb; padding: 3px 0 3px 16px; position: relative;
+    }
+    .song-list li::before {
+      content: '\266A'; position: absolute; left: 0;
+      color: var(--accent-flat, #a78bfa); font-size: 0.7rem;
+    }
+    .sns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+    .sns-item {
+      background: #1a1a2e; border: 1px solid #2a2a4a;
+      border-radius: 8px; padding: 8px; text-align: center;
+    }
+    .sns-platform { font-size: 0.7rem; color: #666; }
+    .sns-count { font-size: 0.9rem; font-weight: 700; color: #e0e0e0; }
+    .fan-quote {
+      font-size: 0.82rem; color: #bbb; font-style: italic; line-height: 1.7;
+      border-left: 3px solid var(--accent-flat, #a78bfa); padding-left: 12px;
+    }
+    .episode-list { list-style: none; }
+    .episode-list li {
+      font-size: 0.8rem; color: #bbb; padding: 5px 0 5px 16px;
+      position: relative; border-bottom: 1px solid #1a1a2e;
+    }
+    .episode-list li:last-child { border-bottom: none; }
+    .episode-list li::before {
+      content: '\2605'; position: absolute; left: 0;
+      color: var(--accent-flat, #a78bfa); font-size: 0.6rem; top: 7px;
+    }
+    .episode-title { font-weight: 700; color: #ddd; }
+    .summary { max-width: 1400px; margin: 0 auto 60px; padding: 0 20px; }
+    .summary h2 { font-size: 1.5rem; color: #a78bfa; margin-bottom: 20px; text-align: center; }
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .summary-table th {
+      background: #1a1a2e; color: #a78bfa; padding: 10px 16px;
+      text-align: left; border: 1px solid #2a2a4a;
+    }
+    .summary-table td { padding: 10px 16px; border: 1px solid #1e1e3a; color: #ccc; }
+    .summary-table tr:hover td { background: #111120; }
+    footer {
+      text-align: center; padding: 30px; color: #444;
+      font-size: 0.8rem; border-top: 1px solid #1a1a2e;
+    }
+    .card[data-id="1"]  { --accent1: #7c3aed; --accent2: #ec4899; --accent-flat: #c084fc; }
+    .card[data-id="2"]  { --accent1: #1e3a5f; --accent2: #0f766e; --accent-flat: #67e8f9; }
+    .card[data-id="3"]  { --accent1: #4c1d95; --accent2: #6d28d9; --accent-flat: #a78bfa; }
+    .card[data-id="4"]  { --accent1: #7f1d1d; --accent2: #b45309; --accent-flat: #fbbf24; }
+    .card[data-id="5"]  { --accent1: #1e40af; --accent2: #6d28d9; --accent-flat: #93c5fd; }
+    .card[data-id="6"]  { --accent1: #164e63; --accent2: #0e7490; --accent-flat: #22d3ee; }
+    .card[data-id="7"]  { --accent1: #065f46; --accent2: #1d4ed8; --accent-flat: #34d399; }
+    .card[data-id="8"]  { --accent1: #831843; --accent2: #9d174d; --accent-flat: #f9a8d4; }
+    .card[data-id="9"]  { --accent1: #7f1d1d; --accent2: #991b1b; --accent-flat: #f87171; }
+    .card[data-id="10"] { --accent1: #1e3a5f; --accent2: #1e1b4b; --accent-flat: #818cf8; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>推しステ キャラクター名鑑</h1>
+  <p>10キャラクター 完全設定資料</p>
+</header>
+
+<nav>
+  <a href="#c1">1. 樹里</a>
+  <a href="#c2">2. 愛梨</a>
+  <a href="#c3">3. 紫音</a>
+  <a href="#c4">4. 陽</a>
+  <a href="#c5">5. アリス</a>
+  <a href="#c6">6. セレナ</a>
+  <a href="#c7">7. アメリ</a>
+  <a href="#c8">8. 奈々</a>
+  <a href="#c9">9. リタ</a>
+  <a href="#c10">10. マリア</a>
+  <a href="#summary">サマリー</a>
+</nav>
+
+<div class="grid">
+
+  <!-- 1. 樹里 -->
+  <div class="card" data-id="1" id="c1">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_01_profile.jpg" alt="樹里">
+    <div class="card-header">
+      <div class="card-number">1</div>
+      <div class="card-name">樹里 <span style="font-size:1.2rem;">/ Julie</span></div>
+      <div class="card-name-sub">本名：桜井 樹里（さくらい じゅり）</div>
+      <div class="card-concept">叶わぬ恋を歌う情熱のシンガー</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2003.7.16（22歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蟹座 / O型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">162cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">神奈川県横浜市</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">栗色ロングウェーブ</span><span class="tag">大きな茶色の瞳</span>
+          <span class="tag">泣きぼくろ</span><span class="tag">八重歯</span><span class="tag">色白</span><span class="tag">儚げ</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">16歳の初失恋</span>：既婚の先輩に告白→拒絶→3ヶ月不登校→「星降る夜に」誕生</li>
+          <li><span class="episode-title">デビュー前夜事件</span>：倒れて救急搬送→点滴しながら病院を抜け出す</li>
+          <li><span class="episode-title">2024年生配信事故</span>：元カレの話で号泣、切り忘れで1時間拡散</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">48万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">120万</div></div>
+          <div class="sns-item"><div class="sns-platform">FC会員</div><div class="sns-count">3.2万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>星降る夜に</li><li>二人だけの世界</li><li>永遠の誓い</li>
+          <li>届かない愛</li><li>開けなかった扉</li><li>空っぽの腕</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「守りたくなる」「泣き顔が美しすぎる」「感情がダダ漏れで嘘がない」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 愛梨 -->
+  <div class="card" data-id="2" id="c2">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_02_profile.jpg" alt="愛梨">
+    <div class="card-header">
+      <div class="card-number">2</div>
+      <div class="card-name">愛梨 <span style="font-size:1.2rem;">/ Airi</span></div>
+      <div class="card-name-sub">本名：黒木 愛梨（くろき あいり）</div>
+      <div class="card-concept">知的な心理戦を歌う謎の女</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2001.10.31（24歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蠍座 / AB型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">168cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">東京都港区</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">漆黒ショートボブ</span><span class="tag">切れ長アーモンド目</span>
+          <span class="tag">陶器肌</span><span class="tag">クール</span><span class="tag">ミステリアス</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">19歳の事件</span>：心理学で絡んできた客を泣かせて撃退→「The Woman」誕生</li>
+          <li><span class="episode-title">覆面時代</span>：3年間顔を隠して活動、正体バレ時「つまらない」と一言</li>
+          <li><span class="episode-title">ライブでの指摘</span>：客席に「あなた、嘘をついてますね」→後日拡散</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">X</div><div class="sns-count">62万</div></div>
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">35万</div></div>
+          <div class="sns-item"><div class="sns-platform">FC会員</div><div class="sns-count">2.8万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>The Woman</li><li>心理ゲーム</li><li>秘密の鍵</li>
+          <li>名前のない光</li><li>五時の馬車</li><li>隣を歩く</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「ギャップがエグい」「暗号解読が楽しい」「猫カフェの情報が出た時の衝撃」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 紫音 -->
+  <div class="card" data-id="3" id="c3">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_03_profile.jpg" alt="紫音">
+    <div class="card-header">
+      <div class="card-number">3</div>
+      <div class="card-name">紫音 <span style="font-size:1.2rem;">/ Shion</span></div>
+      <div class="card-name-sub">本名：藤堂 紫音（とうどう しおん）</div>
+      <div class="card-concept">和の心で恋を綴る琴の歌姫</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2002.11.17（23歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蠍座 / A型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">158cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">京都府京都市</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">黒髪紫ハイライト</span><span class="tag">ぱっつん前髪</span>
+          <span class="tag">垂れ目</span><span class="tag">色白</span><span class="tag">和風</span><span class="tag">繊細</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">17歳の失恋</span>：和歌を渡す→「重い」と拒絶→3ヶ月引きこもり</li>
+          <li><span class="episode-title">初ライブ事件</span>：緊張で琴の弦が切れる→泣きながら「ごめんなさい」→スタンディングオベーション</li>
+          <li><span class="episode-title">猫騒動</span>：飼い猫3匹が配信で琴の上で寝る→「琴猫配信」定番に</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">28万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">15万</div></div>
+          <div class="sns-item"><div class="sns-platform">FC会員</div><div class="sns-count">1.8万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>紫の記憶</li><li>月夜の独白</li><li>恋文</li>
+          <li>それだけで</li><li>遅すぎた季節</li><li>優しさの檻</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「ギャップの塊」「猫との絡みが尊い」「ゲーム配信の毒舌が面白い」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 陽 -->
+  <div class="card" data-id="4" id="c4">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_04_profile.jpg" alt="陽">
+    <div class="card-header">
+      <div class="card-number">4</div>
+      <div class="card-name">陽 <span style="font-size:1.2rem;">/ Yoh</span></div>
+      <div class="card-name-sub">本名：楊 美玲（ヤン メイリン）</div>
+      <div class="card-concept">妖艶な魅力で魅了する中華歌姫</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2004.8.8（21歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">獅子座 / B型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">165cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">兵庫県神戸市中華街</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">漆黒ロング</span><span class="tag">赤メッシュ</span>
+          <span class="tag">猫目</span><span class="tag">小麦色</span><span class="tag">妖艶</span><span class="tag">セクシー</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">18歳の賭け麻雀事件</span>：中華街の大人と麻雀全勝→「楊家の姫」伝説</li>
+          <li><span class="episode-title">デビュー前スキャンダル</span>：実業家との交際が週刊誌に→「利用されただけ」と号泣</li>
+          <li><span class="episode-title">2024年上海ライブ</span>：ネット炎上→ステージで中国語反論→「強い女」として支持</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">85万</div></div>
+          <div class="sns-item"><div class="sns-platform">Weibo</div><div class="sns-count">210万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">350万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>月下美人</li><li>紅の誘惑</li><li>桃花の面影</li>
+          <li>名前のない感情</li><li>ただ生きて</li><li>私はいた</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「色気がエグい」「麻雀の腕前に惚れた」「納豆食べてる姿が意外すぎて好き」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. アリス -->
+  <div class="card" data-id="5" id="c5">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_05_profile.jpg" alt="アリス">
+    <div class="card-header">
+      <div class="card-number">5</div>
+      <div class="card-name">アリス <span style="font-size:1.2rem;">/ Alice</span></div>
+      <div class="card-name-sub">本名：天野 亜梨子（あまの ありす）</div>
+      <div class="card-concept">ファンタジーの世界から来た夢想歌姫</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2007.4.1（18歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">牡羊座 / AB型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">156cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">北海道札幌市</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">金髪ロングウェーブ</span><span class="tag">青カラコン</span>
+          <span class="tag">ドール顔</span><span class="tag">八重歯</span><span class="tag">不思議</span><span class="tag">メルヘン</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">初ライブ事件</span>：ぬいぐるみに話しかけ始める→「うさぎさんが歌えって言ってる」</li>
+          <li><span class="episode-title">2024年渋谷迷子事件</span>：X「助けて〜どこここ〜」→ファン捜索隊→3時間後原宿で発見</li>
+          <li><span class="episode-title">配信での寝落ち</span>：「ちょっと横になる〜」→そのまま3時間爆睡</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">180万</div></div>
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">95万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">250万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>Wonderland</li><li>兎を追って</li><li>ティーパーティー</li>
+          <li>白い花</li><li>塔の中の女</li><li>止まれない</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「守りたい」「天然すぎて心配」「でもゲームは強い」「迷子のツイートが可愛すぎる」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. セレナ -->
+  <div class="card" data-id="6" id="c6">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_06_profile.jpg" alt="セレナ">
+    <div class="card-header">
+      <div class="card-number">6</div>
+      <div class="card-name">セレナ <span style="font-size:1.2rem;">/ Serena</span></div>
+      <div class="card-name-sub">本名：海部 星奈（かいべ せれな）</div>
+      <div class="card-concept">儚く切ない海の歌姫</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2006.6.21（19歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蟹座 / O型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">160cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">沖縄県石垣島</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">茶色ロングウェーブ</span><span class="tag">垂れ目</span>
+          <span class="tag">日焼け肌</span><span class="tag">儚い</span><span class="tag">海</span><span class="tag">切ない</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">デビューライブの奇跡</span>：海辺ライブで突然イルカの群れが→「セレナが呼んだ」と話題</li>
+          <li><span class="episode-title">17歳の海難事故</span>：溺れた友人を救助→地元紙「海の守り神」掲載</li>
+          <li><span class="episode-title">2025年喉の不調</span>：1ヶ月声が出なくなる→「人魚の呪い」と恐怖→復活後のライブで号泣</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">52万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">25万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">80万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>泡沫の恋</li><li>声なき歌</li><li>人魚の涙</li>
+          <li>二つの旋律の狭間で</li><li>泡沫の姉妹</li><li>罪なき呪い</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「儚すぎて守りたい」「沖縄訛りが癒される」「酒強いギャップ」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. アメリ -->
+  <div class="card" data-id="7" id="c7">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_07_profile.jpg" alt="アメリ">
+    <div class="card-header">
+      <div class="card-number">7</div>
+      <div class="card-name">アメリ <span style="font-size:1.2rem;">/ Amelie</span></div>
+      <div class="card-name-sub">本名：風間 亜芽里（かざま あめり）</div>
+      <div class="card-concept">自由を歌う冒険シンガー</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2003.3.15（22歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">魚座 / B型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">164cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">東京都世田谷区</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">ショートボブ</span><span class="tag">明るい茶色</span>
+          <span class="tag">そばかす</span><span class="tag">日焼け肌</span><span class="tag">自由</span><span class="tag">エネルギッシュ</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">18歳のバックパック旅</span>：大学進学を蹴って40ヶ国世界一周→各国で路上ライブ</li>
+          <li><span class="episode-title">21歳スカイダイビング配信</span>：高度中に生配信→電波途切れ→ファン「死んだ？」→無事着地</li>
+          <li><span class="episode-title">2024年失踪事件</span>：置き手紙「ちょっと旅に出る」→2ヶ月後南米でひょっこり発見</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">78万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">120万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">150万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>空へ</li><li>自由の翼</li><li>世界地図</li>
+          <li>青に溶けたい</li><li>まだ私じゃない</li><li>証明</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「一緒に冒険したい」「ポジティブで元気もらえる」「たまに見せる寂しそうな顔が切ない」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. 奈々 -->
+  <div class="card" data-id="8" id="c8">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_08_profile.jpg" alt="奈々">
+    <div class="card-header">
+      <div class="card-number">8</div>
+      <div class="card-name">奈々 <span style="font-size:1.2rem;">/ Nana</span></div>
+      <div class="card-name-sub">本名：白石 奈々（しらいし なな）</div>
+      <div class="card-concept">癒しの歌声を届ける天使</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2005.7.7（20歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蟹座 / A型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">157cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">長野県軽井沢町</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">柔らかい茶色セミロング</span><span class="tag">垂れ目</span>
+          <span class="tag">色白</span><span class="tag">優しい</span><span class="tag">癒し</span><span class="tag">母性的</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">10歳の決意</span>：倒れた祖母を病院で歌で励ます→「奈々の歌で元気になった」</li>
+          <li><span class="episode-title">18歳のホスピス事件</span>：末期患者に歌う→翌日患者が死去→1週間泣き続ける</li>
+          <li><span class="episode-title">2024年過労入院</span>：ファンの悩み相談全部答えようとして倒れる</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">42万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">35万</div></div>
+          <div class="sns-item"><div class="sns-platform">FC会員</div><div class="sns-count">2.5万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>優しい光</li><li>そばにいるよ</li><li>深呼吸</li>
+          <li>あの方の手</li><li>あの方の図</li><li>あなたも</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「癒される」「優しすぎて心配」「ホラー好きのギャップ」「デスメタル歌ってるの見たい」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. リタ -->
+  <div class="card" data-id="9" id="c9">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_09_profile.jpg" alt="リタ">
+    <div class="card-header">
+      <div class="card-number">9</div>
+      <div class="card-name">リタ <span style="font-size:1.2rem;">/ Rita</span></div>
+      <div class="card-name-sub">本名：佐藤 莉妥（さとう りた）</div>
+      <div class="card-concept">情熱を爆発させる炎の歌姫</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2002.12.24（23歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">山羊座 / O型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">170cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">大阪府大阪市</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">黒髪赤メッシュロング</span><span class="tag">吊り目</span>
+          <span class="tag">炎のタトゥー</span><span class="tag">筋肉質</span><span class="tag">情熱的</span><span class="tag">強い</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">16歳の家出</span>：父と大喧嘩→2ヶ月ダンススタジオで寝泊まり</li>
+          <li><span class="episode-title">22歳のブラジル事件</span>：ライブ中にスリに遭う→犯人を追いかけ捕まえる→現地メディア「samurai woman」</li>
+          <li><span class="episode-title">2024年の大怪我</span>：膝を負傷→松葉杖→「ライブは中止しない」→車椅子で歌う</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">92万</div></div>
+          <div class="sns-item"><div class="sns-platform">TikTok</div><div class="sns-count">180万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">80万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>情熱の色</li><li>炎の女</li><li>負けない</li>
+          <li>拒絶と自由</li><li>壁の向こうから</li><li>最後の数秒</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「かっこいい」「たまに見せる弱さがギャップ」「甘党のギャップ」「実は乙女」</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. マリア -->
+  <div class="card" data-id="10" id="c10">
+    <img class="card-img" src="https://ts-ksato.github.io/ai-idol/assets/img/ai-idol_10_profile.jpg" alt="マリア">
+    <div class="card-header">
+      <div class="card-number">10</div>
+      <div class="card-name">マリア <span style="font-size:1.2rem;">/ Maria</span></div>
+      <div class="card-name-sub">本名：宮本 真理愛（みやもと まりあ）</div>
+      <div class="card-concept">知性と科学を歌うクールビューティ</div>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-title">基本プロフィール</div>
+        <div class="profile-grid">
+          <div class="profile-item"><div class="profile-label">生年月日</div><div class="profile-value">2001.11.7（24歳）</div></div>
+          <div class="profile-item"><div class="profile-label">星座 / 血液型</div><div class="profile-value">蠍座 / AB型</div></div>
+          <div class="profile-item"><div class="profile-label">身長</div><div class="profile-value">168cm</div></div>
+          <div class="profile-item"><div class="profile-label">出身地</div><div class="profile-value">福岡県福岡市</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">容姿</div>
+        <div class="tags">
+          <span class="tag">シルバーグレーセミロング</span><span class="tag">グレーカラコン</span>
+          <span class="tag">透白肌</span><span class="tag">クール</span><span class="tag">知的</span><span class="tag">未来的</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">伝説のエピソード</div>
+        <ul class="episode-list">
+          <li><span class="episode-title">15歳の科学オリンピック</span>：国際金メダル→「友達ができると思った」と号泣</li>
+          <li><span class="episode-title">22歳の博士号</span>：最年少取得→授賞式に一人で参加、誰とも話さず帰宅</li>
+          <li><span class="episode-title">23歳の音楽との出会い</span>：シンセサイザーに触れ「美しい方程式だ」→科学と音楽の融合</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">SNSフォロワー</div>
+        <div class="sns-grid">
+          <div class="sns-item"><div class="sns-platform">X</div><div class="sns-count">58万</div></div>
+          <div class="sns-item"><div class="sns-platform">Instagram</div><div class="sns-count">25万</div></div>
+          <div class="sns-item"><div class="sns-platform">YouTube</div><div class="sns-count">40万</div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">代表曲</div>
+        <ul class="song-list">
+          <li>光の方程式</li><li>量子の恋</li><li>星の観測者</li>
+        </ul>
+      </div>
+      <div class="section">
+        <div class="section-title">ファンが語る推しポイント</div>
+        <div class="fan-quote">「頭良すぎて尊敬」「友達欲しいって言ってるのかわいい」「乙女ゲー好きなの意外」</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- サマリー -->
+<div class="summary" id="summary">
+  <h2>📊 10キャラクター データサマリー</h2>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>#</th><th>芸名</th><th>コンセプト</th><th>年齢</th><th>音楽ジャンル</th><th>最大フォロワー</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>樹里</td><td>叶わぬ恋の情熱シンガー</td><td>22歳</td><td>バラード</td><td>TikTok 120万</td></tr>
+      <tr><td>2</td><td>愛梨</td><td>知的な心理戦の謎の女</td><td>24歳</td><td>ジャズ</td><td>X 62万</td></tr>
+      <tr><td>3</td><td>紫音</td><td>和の心の琴の歌姫</td><td>23歳</td><td>J-Pop</td><td>Instagram 28万</td></tr>
+      <tr><td>4</td><td>陽</td><td>妖艶な中華歌姫</td><td>21歳</td><td>ワールドミュージック</td><td>TikTok 350万</td></tr>
+      <tr><td>5</td><td>アリス</td><td>ファンタジーの夢想歌姫</td><td>18歳</td><td>エレクトロニカ</td><td>TikTok 250万</td></tr>
+      <tr><td>6</td><td>セレナ</td><td>儚く切ない海の歌姫</td><td>19歳</td><td>アンビエント</td><td>Instagram 52万</td></tr>
+      <tr><td>7</td><td>アメリ</td><td>自由を歌う冒険シンガー</td><td>22歳</td><td>ロック</td><td>TikTok 150万</td></tr>
+      <tr><td>8</td><td>奈々</td><td>癒しの歌声の天使</td><td>20歳</td><td>ヒーリング</td><td>YouTube 35万</td></tr>
+      <tr><td>9</td><td>リタ</td><td>情熱の炎の歌姫</td><td>23歳</td><td>ラテン</td><td>TikTok 180万</td></tr>
+      <tr><td>10</td><td>マリア</td><td>知性と科学のクールビューティ</td><td>24歳</td><td>テクノポップ</td><td>X 58万</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  推しステ キャラクター名鑑 — 10キャラクター完全設定資料
+</footer>
+
+</body>
+</html>
